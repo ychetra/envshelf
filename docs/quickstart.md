@@ -66,6 +66,16 @@ docker compose run --rm \
   --catalog /var/lib/envshelf/catalog.json
 ```
 
+For an existing host tree, configure the mapping before starting the dashboard. The first value is the directory Docker mounts; the second is the host-path prefix already recorded in the catalog:
+
+```dotenv
+ENVSHELF_PROJECTS_HOST_PATH=/Users/me/Projects
+ENVSHELF_CATALOG_ROOT=/Users/me/Projects
+ENVSHELF_PROJECT_ROOT=/workspace
+```
+
+The server maps `/Users/me/Projects/example-api` to `/workspace/example-api` and rejects entries outside that host root. For a new local demo, the `.env.example` `./projects` defaults are sufficient.
+
 For restore, use the same mounts and replace `encrypt` with `restore`, passing `--identity-file /keys/identity.txt`. Keep the key mount read-only. Do not bake keys into an image or use `docker build` context containing a private identity.
 
 ## Moving machines

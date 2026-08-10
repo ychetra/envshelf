@@ -2,17 +2,27 @@ services:
   envshelf:
     build: .
     ports:
-      - "${ENVSHELF_PORT:-8787}:8787"
+      - "127.0.0.1:${ENVSHELF_PORT:-8787}:8787"
     environment:
+      ENVSHELF_BIND: 0.0.0.0
       ENVSHELF_DATA_DIR: ${ENVSHELF_DATA_DIR:-/var/lib/envshelf}
+      # Catalog paths may be host paths; the server maps this root to /workspace.
+      ENVSHELF_CATALOG_ROOT: ${ENVSHELF_CATALOG_ROOT:-/workspace}
+      ENVSHELF_PROJECT_ROOT: ${ENVSHELF_PROJECT_ROOT:-/workspace}
+      ENVSHELF_RECIPIENT_FILE: ${ENVSHELF_RECIPIENT_FILE:-/keys/recipient.txt}
+      ENVSHELF_IDENTITY_FILE: ${ENVSHELF_IDENTITY_FILE:-/keys/identity.txt}
     volumes:
       - envshelf-data:/var/lib/envshelf
+      # Defaults are empty ./projects and ./keys directories. Set these in .env
+      # to expose your real project root and age directory explicitly.
+      - ${ENVSHELF_PROJECTS_HOST_PATH:-./projects}:/workspace:rw
+      - ${ENVSHELF_KEYS_HOST_PATH:-./keys}:/keys:ro
     restart: unless-stopped
     read_only: true
     tmpfs:
       - /tmp
     security_opt:
       - no-new-privileges:true
+
 volumes:
   envshelf-data:
-
