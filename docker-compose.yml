@@ -1,0 +1,18 @@
+services:
+  envshelf:
+    build: .
+    ports:
+      - "${ENVSHELF_PORT:-8787}:8787"
+    environment:
+      ENVSHELF_DATA_DIR: ${ENVSHELF_DATA_DIR:-/var/lib/envshelf}
+    volumes:
+      - envshelf-data:/var/lib/envshelf
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  envshelf-data:
+

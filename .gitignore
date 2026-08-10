@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+secrets/
+data/catalog.json
+*.before-restore.*
+identity.txt
+*.agekey
+*.recipient
+*.sqlite
+__pycache__/
+*.pyc
+.DS_Store
+.venv/
+node_modules/
