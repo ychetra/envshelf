@@ -1,7 +1,8 @@
 # EnvShelf dashboard demo
 
-[Watch the short product preview](assets/envshelf-preview.mp4). It is a brand
-illustration, not a simulated app recording. The steps below run the real
+![EnvShelf UI walkthrough](assets/envshelf-ui-walkthrough.gif)
+
+[Watch the short UI clip](assets/envshelf-ui-walkthrough.mp4). It uses the real
 dashboard against a disposable synthetic catalog—no real project paths, Git
 repositories, environment values, or key material.
 
@@ -29,7 +30,6 @@ creates a temporary fixture and removes it when stopped with Ctrl-C.
 
 ## Recording note
 
-The included preview intentionally does not pretend to be an interaction
-recording. To create a real walkthrough, run this synthetic demo and record the
+For a longer interactive walkthrough, run this synthetic demo and record the
 four steps above with any local screen recorder. Never use a real project or
 real environment file in release media.

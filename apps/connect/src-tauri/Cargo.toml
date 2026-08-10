@@ -1,6 +1,6 @@
 [package]
 name = "envshelf-connect"
-version = "0.1.1"
+version = "0.1.2"
 description = "Local, metadata-only Docker connector for EnvShelf"
 authors = ["EnvShelf contributors"]
 edition = "2021"

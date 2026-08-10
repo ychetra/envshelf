@@ -1,6 +1,6 @@
 # EnvShelf
 
-> **v0.1.1** — a local-first home for project environment metadata and encrypted `.env` backups.
+> **v0.1.2** — a local-first home for project environment metadata and encrypted `.env` backups.
 
 ![EnvShelf product cover](docs/assets/envshelf-cover.png)
 
@@ -77,7 +77,7 @@ See [docs/quickstart.md](docs/quickstart.md), [docs/security.md](docs/security.m
 
 ## Demo media
 
-Watch the [six-second product preview](docs/assets/envshelf-preview.mp4), then
-run the [reproducible synthetic dashboard demo](docs/demo.md). The preview is a
-brand illustration; the demo is the real app flow using disposable metadata
-only—never a real project, path, key, or environment value.
+![EnvShelf UI walkthrough](docs/assets/envshelf-ui-walkthrough.gif)
+
+The animation autoplays on GitHub and shows the real light-first dashboard
+against synthetic metadata. Watch or download the [short UI clip](docs/assets/envshelf-ui-walkthrough.mp4), then run the [reproducible synthetic dashboard demo](docs/demo.md). No real project, path, key, or environment value appears in this media.
