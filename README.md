@@ -1,6 +1,6 @@
 # EnvShelf
 
-> **v0.1.0** — a local-first home for project environment metadata and encrypted `.env` backups.
+> **v0.1.1** — a local-first home for project environment metadata and encrypted `.env` backups.
 
 ![EnvShelf product cover](docs/assets/envshelf-cover.png)
 
