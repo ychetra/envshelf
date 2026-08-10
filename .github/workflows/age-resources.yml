@@ -1,0 +1,50 @@
+name: Verify age resources
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['connect-v*']
+
+jobs:
+  age-artifacts:
+    # This job verifies the exact upstream archives before a release job can
+    # bundle them. Sigsum proof verification is intentionally a separate gate;
+    # the proof is retained here and must be wired to the release-log key.
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - platform: darwin-amd64
+            archive: age-v1.3.1-darwin-amd64.tar.gz
+            sha256: 2b233301ad21ab7b1eabd9ae1198a164005fa4928fcdd745d47c39f8593209d7
+          - platform: darwin-arm64
+            archive: age-v1.3.1-darwin-arm64.tar.gz
+            sha256: 01120ea2cbf0463d4c6bd767f99f3271bbed1cdc8a9aa718a76ba1fe4f01998b
+          - platform: windows-amd64
+            archive: age-v1.3.1-windows-amd64.zip
+            sha256: c56e8ce22f7e80cb85ad946cc82d198767b056366201d3e1a2b93d865be38154
+          - platform: linux-amd64
+            archive: age-v1.3.1-linux-amd64.tar.gz
+            sha256: bdc69c09cbdd6cf8b1f333d372a1f58247b3a33146406333e30c0f26e8f51377
+          - platform: linux-arm64
+            archive: age-v1.3.1-linux-arm64.tar.gz
+            sha256: c6878a324421b69e3e20b00ba17c04bc5c6dab0030cfe55bf8f68fa8d9e9093a
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download pinned archive and proof
+        env:
+          ARCHIVE: ${{ matrix.archive }}
+        run: |
+          curl --fail --location --retry 3 --output "$ARCHIVE" "https://github.com/FiloSottile/age/releases/download/v1.3.1/$ARCHIVE"
+          curl --fail --location --retry 3 --output "$ARCHIVE.proof" "https://github.com/FiloSottile/age/releases/download/v1.3.1/$ARCHIVE.proof"
+          test -s "$ARCHIVE.proof"
+      - name: Verify SHA-256
+        run: python3 scripts/verify_age_artifact.py "${{ matrix.archive }}" "${{ matrix.sha256 }}"
+      - name: Upload verified resources
+        uses: actions/upload-artifact@v4
+        with:
+          name: age-v1.3.1-${{ matrix.platform }}
+          path: |
+            ${{ matrix.archive }}
+            ${{ matrix.archive }}.proof

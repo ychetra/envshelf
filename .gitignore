@@ -1,6 +1,7 @@
 .env
 .env.*
 !.env.example
+docker-compose.override.yml
 secrets/
 data/catalog.json
 *.before-restore.*
@@ -14,3 +15,6 @@ __pycache__/
 .venv/
 node_modules/
 web/dist/
+.build/
+docs/local/
+macos/EnvShelfDrop/.build/

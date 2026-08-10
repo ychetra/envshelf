@@ -9,6 +9,9 @@ services:
       # Catalog paths may be host paths; the server maps this root to /workspace.
       ENVSHELF_CATALOG_ROOT: ${ENVSHELF_CATALOG_ROOT:-/workspace}
       ENVSHELF_PROJECT_ROOT: ${ENVSHELF_PROJECT_ROOT:-/workspace}
+      # Comma-separated container paths. The dashboard only accepts init
+      # paths beneath these explicit roots.
+      ENVSHELF_ALLOWED_PROJECT_ROOTS: ${ENVSHELF_ALLOWED_PROJECT_ROOTS:-/workspace}
       ENVSHELF_RECIPIENT_FILE: ${ENVSHELF_RECIPIENT_FILE:-/keys/recipient.txt}
       ENVSHELF_IDENTITY_FILE: ${ENVSHELF_IDENTITY_FILE:-/keys/identity.txt}
     volumes:
@@ -16,6 +19,8 @@ services:
       # Defaults are empty ./projects and ./keys directories. Set these in .env
       # to expose your real project root and age directory explicitly.
       - ${ENVSHELF_PROJECTS_HOST_PATH:-./projects}:/workspace:rw
+      # Optional second explicit root for a separate host tree.
+      - ${ENVSHELF_PROJECTS_HOST_PATH_2:-./projects-2}:/workspace-2:rw
       - ${ENVSHELF_KEYS_HOST_PATH:-./keys}:/keys:ro
     restart: unless-stopped
     read_only: true

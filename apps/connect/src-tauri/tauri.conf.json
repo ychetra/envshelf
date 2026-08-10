@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "EnvShelf Connect",
+  "version": "0.1.0",
+  "identifier": "com.envshelf.connect",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [{
+      "label": "main",
+      "title": "EnvShelf Connect",
+      "width": 820,
+      "height": 720,
+      "minWidth": 560,
+      "minHeight": 540,
+      "resizable": true,
+      "dragDropEnabled": true
+    }],
+    "security": { "csp": null }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "createUpdaterArtifacts": false,
+    "category": "Utility",
+    "shortDescription": "Connect local project folders to EnvShelf safely",
+    "longDescription": "A local-only companion that detects project metadata and configures an explicit Docker mount without reading secret values."
+    ,"resources": {
+      "../../../app": "app",
+      "../../../standalone": "standalone",
+      "../../../web": "web"
+    }
+  }
+}

@@ -8,7 +8,9 @@ EnvShelf is local-only metadata plus a thin wrapper around `age`. It does not pr
 - Encryption uses a public age recipient. Decryption requires the private age identity file, which is supplied by path and never parsed by EnvShelf.
 - Output is written to a temporary file and atomically renamed. Restore preserves an existing target beside it before replacement.
 - The Docker service is non-root, read-only at its root filesystem, and has no-new-privileges. Project and key access exists only when explicitly mounted for a CLI run.
-- Browser actions accept only a validated registered slug and an empty POST body. The server derives project, backup, catalog, recipient, and identity paths from local configuration; it rejects projects outside `ENVSHELF_PROJECT_ROOT` and never returns subprocess output.
+- Browser actions accept only a validated registered slug and an empty POST body. The server derives project, backup, catalog, recipient, and identity paths from local configuration; it rejects projects outside `ENVSHELF_ALLOWED_PROJECT_ROOTS` and never returns subprocess output.
+- The initializer accepts only a validated Git URL and a path beneath `ENVSHELF_ALLOWED_PROJECT_ROOTS`; it rejects symlinks, traversal, existing targets, and environment filenames outside the cloned project. Git output is discarded.
+- The optional macOS Finder helper may submit a host absolute folder path, but the server maps it only beneath `ENVSHELF_CATALOG_ROOT` into an explicit mounted root. It rejects paths outside that root and user-controlled symlink components; it never accepts folder contents or secret values.
 - Required environment names are parsed from `.env.example`; values from that file and `.env` are never included in API responses.
 
 ## Public Git rules

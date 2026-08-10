@@ -7,7 +7,7 @@ COPY src ./src
 RUN npm run build
 
 FROM python:3.12-alpine
-RUN apk add --no-cache age
+RUN apk add --no-cache age git
 WORKDIR /app
 COPY app ./app
 COPY data ./data
