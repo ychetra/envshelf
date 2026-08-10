@@ -3,7 +3,7 @@ name: EnvShelf Connect
 on:
   workflow_dispatch:
   push:
-    tags: ['connect-v*']
+    tags: ['v*']
 
 jobs:
   build:
