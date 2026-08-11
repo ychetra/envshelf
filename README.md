@@ -1,83 +1,101 @@
 # EnvShelf
 
-> **v0.1.2** — a local-first home for project environment metadata and encrypted `.env` backups.
-
-![EnvShelf product cover](docs/assets/envshelf-cover.png)
-
-EnvShelf keeps developer environment values on your machine while making the
-boring parts easy: see projects, required environment-key names, backup state,
-and Git origins in one local dashboard. Backups use the established `age` tool;
-the dashboard never accepts, returns, or logs secret values.
-
-The dashboard is local-only and metadata-only. It has a draggable project card workspace with Grid/List views, pins, paths, Git URLs, backup status, and safe environment-key rows (never values). Click a card for details; `Backup now` and typed-confirmation `Restore` are guarded server actions. The `New project` dialog clones into an explicit mounted root, so you can initialize projects from the UI without granting arbitrary host filesystem access.
-
-## Start the dashboard
-
-```sh
-cp .env.example .env
-mkdir -p projects keys
-docker compose up --build
-```
-
-Open <http://localhost:8787>. The named Docker volume keeps the local catalog across container recreation. Stop it with `docker compose down`; this leaves the volume in place. By default, `./projects` and `./keys` are empty, explicit mounts. Set `ENVSHELF_PROJECTS_HOST_PATH`, `ENVSHELF_CATALOG_ROOT`, `ENVSHELF_ALLOWED_PROJECT_ROOTS`, and `ENVSHELF_KEYS_HOST_PATH` in `.env` to expose real locations; for host-path catalogs, the first two should be the same host root. The key mount remains read-only. The initializer accepts only paths beneath the listed container roots.
-
-## Run without Docker
-
-Python 3 users can run a native, loopback-only dashboard with one explicit
-project root:
-
-```sh
-python3 standalone/run.py --projects-root "$HOME/Projects"
-```
-
-This mode stores its catalog in OS app data and sets `standalone: true` in
-`/api/config`; it does not require Docker or a filesystem mount. The Tauri
-EnvShelf Connect app exposes the same flow on macOS, Windows, and Linux. See
-[`docs/standalone.md`](docs/standalone.md) for the platform paths and the
-verified age sidecar resource plan.
-
-The dashboard action routes require a registered project path under `ENVSHELF_PROJECT_ROOT`, a recipient at `ENVSHELF_RECIPIENT_FILE`, and an identity at `ENVSHELF_IDENTITY_FILE`. No path, key, or secret can be supplied by the browser request.
-
-### Finder drag-and-drop on macOS
-
-For literal drag-and-drop from Finder, build the optional native helper in
-[`macos/EnvShelfDrop`](macos/EnvShelfDrop). It sends only the folder path,
-display name, environment filenames, and credential-free Git origin to the
-local dashboard. Configure the host project root in `ENVSHELF_CATALOG_ROOT`
-and its container mount in `ENVSHELF_PROJECT_ROOT`; the server maps only paths
-under that root and rejects symlinks/outside paths.
-
-## CLI in one minute
-
-Run natively with Python and `age` installed, or run the same commands through the Docker image:
-
-```sh
-python3 -m app.cli init \
-  --identity-file ~/.config/envshelf/age/identity.txt \
-  --recipient-file ~/.config/envshelf/age/recipient.txt
-python3 -m app.cli register --slug my-api --repo https://github.com/me/my-api --path /path/to/my-api
-python3 -m app.cli encrypt --slug my-api --recipient-file ~/.config/envshelf/age/recipient.txt
-python3 -m app.cli restore --slug my-api --identity-file ~/.config/envshelf/age/identity.txt
-```
-
-The default encrypted output is `backups/my-api.env.age`. Existing plaintext is preserved as `.env.before-restore.<UTC timestamp>` before restore. The catalog contains metadata and paths only; it never contains environment values or private key contents.
-
-## First and second machine
-
-1. On the first machine, run `init` once and keep the identity file in a secure password-manager/Keychain-backed location. Keep the recipient file with the project tooling.
-2. Commit only the encrypted `backups/<slug>.env.age` file and metadata that is safe for your repository. The private identity file must stay out of Git and out of the Docker image.
-3. On another machine, clone the repository, install/run EnvShelf, copy the private identity into the same protected local key path, register the local project path, then run `restore`.
-4. If the identity is lost, an age backup cannot be recovered. Test restore on a disposable checkout before relying on the workflow.
-
-## Public-repository boundary
-
-Safe to publish: EnvShelf source, `catalog.example.json`, documentation, and `.age` ciphertext encrypted to your recipient. Never publish: `.env` files, decrypted restore backups, age identity/private-key files, tokens, passwords, or logs containing them. Review `git diff` and `git status --ignored` before every push.
-
-See [docs/quickstart.md](docs/quickstart.md), [docs/security.md](docs/security.md), and [docs/architecture.md](docs/architecture.md) for the complete workflow.
-
-## Demo media
+> **v0.1.2** · Local-first `.env` backups and a safe project environment dashboard.
 
 ![EnvShelf UI walkthrough](docs/assets/envshelf-ui-walkthrough.gif)
 
-The animation autoplays on GitHub and shows the real light-first dashboard
-against synthetic metadata. Watch or download the [short UI clip](docs/assets/envshelf-ui-walkthrough.mp4), then run the [reproducible synthetic dashboard demo](docs/demo.md). No real project, path, key, or environment value appears in this media.
+[Watch the short UI video](docs/assets/envshelf-ui-walkthrough.mp4) · [Download the desktop app](https://github.com/ychetra/envshelf/releases/latest) · [See the demo](docs/demo.md)
+
+EnvShelf keeps environment values on your machine. It shows only project metadata, environment-key names, and backup status; encryption is delegated to [`age`](https://age-encryption.org/).
+
+## What it does
+
+- Local dashboard: grid/list cards, pins, Git origin, key status, backup and typed restore.
+- Encrypted backups: commit `.env.age` ciphertext, never `.env` plaintext.
+- Docker or standalone: choose the setup that fits your machine.
+- Native folder picker: EnvShelf Connect supports macOS, Windows, and Linux.
+
+## Fast setup — Docker
+
+Requires Docker Desktop (or Docker Engine with Compose).
+
+```sh
+git clone https://github.com/ychetra/envshelf.git
+cd envshelf
+cp .env.example .env
+mkdir -p projects keys
+docker compose up -d --build
+```
+
+Open <http://localhost:8787>. The dashboard is loopback-only and its catalog survives container recreation in a Docker volume.
+
+### Use your existing Projects folder
+
+Edit `.env`, then restart Compose. Use an absolute path; never put keys or environment values in this file.
+
+```dotenv
+ENVSHELF_PROJECTS_HOST_PATH=/absolute/path/to/Projects
+ENVSHELF_CATALOG_ROOT=/absolute/path/to/Projects
+ENVSHELF_ALLOWED_PROJECT_ROOTS=/workspace
+```
+
+```sh
+docker compose up -d --build
+```
+
+On Windows, use a Docker Desktop-shared path such as `C:/Users/you/Projects`.
+
+## Fast setup — no Docker
+
+Requires Python 3. Run the local-only dashboard against one approved folder:
+
+```sh
+git clone https://github.com/ychetra/envshelf.git
+cd envshelf
+python3 standalone/run.py --projects-root "$HOME/Projects"
+```
+
+Open the printed `http://127.0.0.1:8787` URL. Its catalog stays in OS app data; project files never move or upload.
+
+## Desktop app: EnvShelf Connect
+
+1. Download **EnvShelf Connect** from the [latest release](https://github.com/ychetra/envshelf/releases/latest).
+2. For standalone mode: choose **Open standalone dashboard**, then choose your Projects folder.
+3. For Docker mode: drop/choose a project folder, choose the EnvShelf folder containing `docker-compose.yml`, then click **Approve & connect**.
+
+Connect reads only the folder name, `.env*` filenames, and a credential-free Git remote. It never reads `.env` values or uses the Docker socket.
+
+## Backup and restore commands
+
+Install [`age`](https://age-encryption.org/) first. Keep the private identity in your password manager or another encrypted local store, never in Git.
+
+```sh
+# One time: create an age identity and recipient file.
+python3 -m app.cli init \
+  --identity-file ~/.config/envshelf/age/identity.txt \
+  --recipient-file ~/.config/envshelf/age/recipient.txt
+
+# Register a project (metadata only), then create encrypted backup.
+python3 -m app.cli register --slug my-api --repo https://github.com/me/my-api --path /absolute/path/to/my-api
+python3 -m app.cli encrypt --slug my-api --recipient-file ~/.config/envshelf/age/recipient.txt
+
+# Restore later. Existing .env is first saved as .env.before-restore.<timestamp>.
+python3 -m app.cli restore --slug my-api --identity-file ~/.config/envshelf/age/identity.txt
+```
+
+## Move to another machine
+
+1. Clone the project containing the encrypted `backups/*.env.age` file.
+2. Install EnvShelf and `age`.
+3. Copy your private age identity from your encrypted password manager.
+4. Register the new local checkout path, then run `restore`.
+
+If the private identity is lost, the encrypted backup cannot be recovered.
+
+## Safety rules
+
+- Commit: source, metadata, and `.env.age` ciphertext.
+- Never commit: `.env`, age identities, tokens, passwords, decrypted backups, or logs with values.
+- The dashboard never displays or returns secret values.
+
+More detail: [quickstart](docs/quickstart.md) · [security](docs/security.md) · [architecture](docs/architecture.md) · [standalone](docs/standalone.md) · [Connect](docs/connect.md).

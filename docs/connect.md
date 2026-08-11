@@ -38,5 +38,5 @@ npm run tauri:dev
 npm run tauri:build
 ```
 
-The release workflow builds platform installers on every manual run or
-`connect-v*` tag and uploads them as workflow artifacts.
+The release workflow builds platform installers on every manual run or `v*`
+tag and uploads them as workflow artifacts.

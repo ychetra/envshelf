@@ -29,14 +29,13 @@ folder. The server only permits paths below the selected root.
 
 ## Desktop app
 
-EnvShelf Connect includes a **Open standalone dashboard** flow. Choose the
-EnvShelf checkout/resource folder once and then choose the projects folder.
-The app launches `standalone/run.py` and opens the local dashboard. The Docker
+EnvShelf Connect includes an **Open standalone dashboard** flow. Choose the
+projects folder and it launches the bundled server on loopback. The Docker
 connector remains available as a separate flow for users who prefer Compose.
 
-The current local proof expects Python 3 and the EnvShelf resource folder to be
-available. Release builds will bundle the server resources and a verified age
-sidecar; they must not silently search or mount a whole home directory.
+The current release bundles EnvShelf server resources. It still uses the local
+Python 3 and `age` executables; it must not silently search or mount a whole
+home directory.
 
 ## Encryption boundary
 
